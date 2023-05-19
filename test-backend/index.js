@@ -7,6 +7,8 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.post("/api/details", (req, res) => {
+  console.log("A real call has been made to the backend")
+
   const { name, email, framework } = req.body;
   const message = `Hello ${name}, your email is ${email}, and your favorite framework is ${framework}, but we can forgive you for that`;
   const response = { message };

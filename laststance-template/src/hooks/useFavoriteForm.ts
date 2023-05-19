@@ -6,7 +6,6 @@ interface FormValues {
   }
 
 const useFavoriteForm = () => {
-  console.log("REAL CALL")
     const [formValues, setFormValues] = useState<FormValues>({
         name: "",
         email: "",

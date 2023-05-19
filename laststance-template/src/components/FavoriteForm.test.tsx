@@ -3,16 +3,14 @@ import { render, fireEvent, waitFor } from '@testing-library/react'
 import FavoriteForm from './FavoriteForm'
 import useFavoriteForm from '../hooks/useFavoriteForm'
 
-// Mock the useFavoriteForm hook
-
-// const mockSubmit: (event: React.FormEvent<HTMLFormElement>) => void = vi.fn()
 const mockSubmit = vi.fn((event) => event.preventDefault())
-const mockInputChange = vi.fn( //05/05/23  Not sure if this is the best way of doing it.
+
+ //05/05/23  Not sure if this is the best way of doing it.
+ // I want to just have expect(mockInputChange).toHaveBeenCalledWith('...') but I can't get it to work
+const mockInputChange = vi.fn(
   (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     event.target.value 
 )
-// const mockInputChange = vi.spyOn(useFavoriteForm, {default})
-
 vi.mock('../hooks/useFavoriteForm', () => {
   const mock = () => ({
     formValues: { name: '', email: '', framework: '' },
@@ -23,26 +21,25 @@ vi.mock('../hooks/useFavoriteForm', () => {
   return { default: mock }
 })
 
-//   const mockHookImplementation = vi.fn(() => 'default').mockImplementation(() => ({
-//     formValues: { name: '', email: '', framework: '' },
-//     handleSubmit: mockSubmit,
-//     handleInputChange: mockInputChange,
-//     responseSentence: 'Test me',
-//   }))
-
-//   vi.spyOn(useFavoriteForm, 'default').mockImplementation(mockHookImplementation)
-
 describe('FavoriteForm', () => {
   it('renders the form correctly', () => {
     const { getByLabelText, getByText } = render(<FavoriteForm />)
-
-    expect(getByLabelText(/Name:/i)).toBeInTheDocument()
-    expect(getByLabelText(/Email:/i)).toBeInTheDocument()
-    expect(getByLabelText(/Favorite framework:/i)).toBeInTheDocument()
-    expect(getByText(/Submit/i)).toBeInTheDocument()
+    const nameField = getByLabelText(/Name:/i)
+    const emailField = getByLabelText(/Email:/i)
+    const frameWorkField = getByLabelText(/Favorite framework:/i)
+    const submitButton = getByText(/Submit/i)
+    
+    expect(submitButton).toBeInTheDocument()
+    expect(frameWorkField).toBeInTheDocument()
+    expect(emailField).toBeInTheDocument()
+    expect(nameField).toBeInTheDocument()
+    expect(getByText(/Test Me/i)).toBeInTheDocument()
   })
 
   it('calls handleInputChange when input values change', () => {
+    // Don't know how I feel about this test
+    // I'm testing that each field is correctly passing events to handleInputChange
+    // but I'm not sure this follows the testing library philosophy
     const { getByLabelText } = render(<FavoriteForm />)
     const { handleInputChange } = useFavoriteForm()
 
@@ -60,6 +57,7 @@ describe('FavoriteForm', () => {
       target: { value: 'React' },
     })
     expect(handleInputChange).toHaveBeenCalledTimes(3)
+    expect(mockInputChange).toHaveNthReturnedWith(3, 'React')
   })
 
   it('calls handleSubmit when the form is submitted', async () => {
@@ -73,15 +71,4 @@ describe('FavoriteForm', () => {
     })
   })
 
-  //   it('displays the response sentence', () => {
-  //     useFavoriteForm.mockImplementation(() => ({
-  //       formValues: { name: '', email: '', framework: '' },
-  //       handleSubmit: jest.fn(),
-  //       handleInputChange: jest.fn(),
-  //       responseSentence: 'Thank you for your submission!',
-  //     }))
-  //     const { getByText } = render(<FavoriteForm />)
-
-  //     expect(getByText(/Thank you for your submission!/i)).toBeInTheDocument()
-  //   })
 })
