@@ -5,7 +5,8 @@ import App from './App'
 
 const root = ReactDOM.createRoot(document.getElementById('root')!)
 
-if (process.env.NODE_ENV === 'development') {
+// this is if you want to mock your backend while developing (I think)
+if (process.env.NODE_ENV === 'development' && false) {
   import('../mocks/browser')
     .then(({ worker }) => {
       worker.start()

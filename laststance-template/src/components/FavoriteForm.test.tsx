@@ -1,74 +1,76 @@
-import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react'
+import { render, fireEvent, screen } from '@testing-library/react'
 import FavoriteForm from './FavoriteForm'
-import useFavoriteForm from '../hooks/useFavoriteForm'
+import { detailsPostResponse } from '../../mocks/handlers'
+import { errorMessages } from '../hooks/useFavoriteForm'
 
-const mockSubmit = vi.fn((event) => event.preventDefault())
-
- //05/05/23  Not sure if this is the best way of doing it.
- // I want to just have expect(mockInputChange).toHaveBeenCalledWith('...') but I can't get it to work
-const mockInputChange = vi.fn(
-  (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    event.target.value 
-)
-vi.mock('../hooks/useFavoriteForm', () => {
-  const mock = () => ({
-    formValues: { name: '', email: '', framework: '' },
-    handleSubmit: mockSubmit,
-    handleInputChange: mockInputChange,
-    responseSentence: 'Test me',
-  })
-  return { default: mock }
-})
-
+/* 06/06/23 NB: by not mocking the hook (instead using MSW), I'm treating this as an Integration test
+        - Additionally, My current thinking is that we can replace *a lot* of unit testing
+          by integration testing components (such as forms) as a whole */
 describe('FavoriteForm', () => {
   it('renders the form correctly', () => {
     const { getByLabelText, getByText } = render(<FavoriteForm />)
-    const nameField = getByLabelText(/Name:/i)
-    const emailField = getByLabelText(/Email:/i)
-    const frameWorkField = getByLabelText(/Favorite framework:/i)
+
+    expect(getByLabelText(/Name:/i)).toBeInTheDocument()
+    expect(getByLabelText(/Email:/i)).toBeInTheDocument()
+    expect(getByLabelText(/Favorite framework:/i)).toBeInTheDocument()
+    expect(getByText(/Submit/i)).toBeInTheDocument()
+  })
+
+  // the test aims to completely test that our name field, its error, and validation work together.
+  // could have separate tests for different ways validation could fail. 
+  it('should display an error under Name field if validation fails', () => {
+    render(<FavoriteForm />)
+    const nameField = screen.getByLabelText(/Name:/i)
+    // check the nameField is not invalid by default
+    expect(nameField).toHaveAttribute('aria-invalid', 'false');
+
+    fireEvent.change(nameField, { target: { value: 'Tech9' } })
+    // check the nameField is invalid after the change event
+    expect(nameField).toHaveAttribute('aria-invalid', 'true');
+    // check the error message is displayed
+    const error = screen.getByRole('alert')
+    expect(error).toBeInTheDocument()
+    // check the error content
+    expect(error).toHaveTextContent(errorMessages.name)
+    // check the error and its field have appropriate aria attributes
+    expect(error).toHaveAttribute('aria-live', 'assertive');
+    const describedById = nameField.getAttribute('aria-describedby');
+    expect(error).toHaveAttribute('id', describedById);
+  })
+
+  it('should display the response sentence when you click submit ', async () => {
+    /*  NB: getByText Vs findByText
+           - getByText is a synchronous function that immediately returns an element if it is found in the DOM
+           - findByText is an asynchronous function that will return a promise that resolves when the element is found
+    */
+    const { getByText, findByText } = render(<FavoriteForm />)
+
     const submitButton = getByText(/Submit/i)
-    
-    expect(submitButton).toBeInTheDocument()
-    expect(frameWorkField).toBeInTheDocument()
-    expect(emailField).toBeInTheDocument()
-    expect(nameField).toBeInTheDocument()
-    expect(getByText(/Test Me/i)).toBeInTheDocument()
+
+    fireEvent.click(submitButton)
+
+    // using the response Body defined in the MSW `handlers.ts` file:
+    const responseSentence = await findByText(detailsPostResponse.message)
+    expect(responseSentence).toBeInTheDocument()
   })
-
-  it('calls handleInputChange when input values change', () => {
-    // Don't know how I feel about this test
-    // I'm testing that each field is correctly passing events to handleInputChange
-    // but I'm not sure this follows the testing library philosophy
-    const { getByLabelText } = render(<FavoriteForm />)
-    const { handleInputChange } = useFavoriteForm()
-
-    fireEvent.change(getByLabelText(/Name:/i), { target: { value: 'John' } })
-    expect(mockInputChange).toHaveBeenCalledTimes(1)
-    expect(mockInputChange).toReturnWith('John')
-
-    fireEvent.change(getByLabelText(/Email:/i), {
-      target: { value: 'john@example.com' },
-    })
-    expect(mockInputChange).toHaveBeenCalledTimes(2)
-    expect(mockInputChange).toHaveNthReturnedWith(2, 'john@example.com')
-
-    fireEvent.change(getByLabelText(/Favorite framework:/i), {
-      target: { value: 'React' },
-    })
-    expect(handleInputChange).toHaveBeenCalledTimes(3)
-    expect(mockInputChange).toHaveNthReturnedWith(3, 'React')
-  })
-
-  it('calls handleSubmit when the form is submitted', async () => {
-    const { getByText } = render(<FavoriteForm />)
-    const { handleSubmit } = useFavoriteForm()
-
-    fireEvent.click(getByText(/Submit/i))
-
-    await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledTimes(1)
-    })
-  })
-
 })
+
+
+
+
+// 09/06/23 This was the original hook mocking code, but I've replaced it with MSW
+
+// const mockSubmit = vi.fn((event) => event.preventDefault())
+// const mockInputChange = vi.fn(
+//   (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+//     event.target.value
+// )
+// vi.mock('../hooks/useFavoriteForm', () => {
+//   const mock = () => ({
+//     formValues: { name: '', email: '', framework: '' },
+//     handleSubmit: mockSubmit,
+//     handleInputChange: mockInputChange,
+//     responseSentence: 'Test me',
+//   })
+//   return { default: mock }
+// })

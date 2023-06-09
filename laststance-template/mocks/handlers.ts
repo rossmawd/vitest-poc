@@ -1,5 +1,8 @@
 import { rest } from 'msw'
 
+export type DetailsPostResponse = { message: string }
+export const detailsPostResponse: DetailsPostResponse = { message: 'Success' }
+
 export const handlers = [
   // rest.get('http://localhost:3000/api/docs_list', (req, res, ctx) => {
   //   const data = [
@@ -10,8 +13,6 @@ export const handlers = [
   //   return res(ctx.status(200), ctx.json(data))
   // }),
   rest.post('http://localhost:4000/api/details', (req, res, ctx) => {
-    return res(
-      ctx.json({ message: 'Success' })
-    )
-  })
+    return res(ctx.json(detailsPostResponse))
+  }),
 ]
