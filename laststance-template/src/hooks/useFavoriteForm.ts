@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {  useState } from 'react'
 import { nameValidation } from '../validators/nameValidation'
 interface FormValues {
   name: string

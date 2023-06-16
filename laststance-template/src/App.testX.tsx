@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 
-import App from './App'
+import App from './pages/Root'
 
 test('Show App Component', () => {
   render(<App />)

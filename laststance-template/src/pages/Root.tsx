@@ -1,32 +1,21 @@
-import fetch from 'cross-fetch'
-import React, { useEffect, useState } from 'react'
-import './index.css'
-import logo from './logo.svg'
-import FavoriteForm from './components/FavoriteForm'
-
-import './App.css'
-
-type DocsList = Array<{ name: string; url: string }>
+import React from 'react'
+import '../index.css'
+import FavoriteForm from '../components/FavoriteForm'
+import '../App.css'
+import { useNavigate } from 'react-router-dom'
 
 const App: React.FC = () => {
-  const [count, setCount] = useState(0)
-  const [docsList, setDocsList] = useState<DocsList>([])
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    fetch('http://localhost:3000/api/docs_list')
-      .then((res) => res.json())
-      .then((data) => {
-        setDocsList(data)
-      })
-  }, [])
-
-  
   return (
     <main className="App">
+      <div className="bg-slate-100 max-w-max flex justify-start flex-1 p-3">
+        <button onClick={() => navigate('./characters')}>
+          View Characters
+        </button>
+      </div>
       <header className="App-header">
-      
-        <FavoriteForm/>
-
+        <FavoriteForm />
       </header>
     </main>
   )
@@ -34,7 +23,8 @@ const App: React.FC = () => {
 
 export default App
 
-{/* <img src={logo} className="App-logo" alt="logo" />
+{
+  /* <img src={logo} className="App-logo" alt="logo" />
 <p>{process.env.REACT_APP_TEXT}</p>
 <p>
   <button
@@ -84,4 +74,5 @@ export default App
         )
       })
     : false}
-</p> */}
+</p> */
+}
