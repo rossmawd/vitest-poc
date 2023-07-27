@@ -3,9 +3,9 @@ import FavoriteForm from './FavoriteForm'
 import { detailsPostResponse } from '../../mocks/handlers'
 import { errorMessages } from '../hooks/useFavoriteForm'
 
-/* 06/06/23 NB: by not mocking the hook (instead using MSW), I'm treating this as an Integration test
-        - Additionally, My current thinking is that we can replace *a lot* of unit testing
-          by integration testing components (such as forms) as a whole */
+// 06/06/23 NB: by not mocking the hook (instead using MSW), I'm treating this as
+// an Integration test.
+
 describe('FavoriteForm', () => {
   it('renders the form correctly', () => {
     const { getByLabelText, getByText } = render(<FavoriteForm />)
@@ -17,25 +17,25 @@ describe('FavoriteForm', () => {
   })
 
   // the test aims to completely test that our name field, its error, and validation work together.
-  // could have separate tests for different ways validation could fail. 
+  // could have separate tests for different ways validation could fail.
   it('should display an error under Name field if validation fails', () => {
     render(<FavoriteForm />)
     const nameField = screen.getByLabelText(/Name:/i)
     // check the nameField is not invalid by default
-    expect(nameField).toHaveAttribute('aria-invalid', 'false');
+    expect(nameField).toHaveAttribute('aria-invalid', 'false')
 
     fireEvent.change(nameField, { target: { value: 'Tech9' } })
     // check the nameField is invalid after the change event
-    expect(nameField).toHaveAttribute('aria-invalid', 'true');
+    expect(nameField).toHaveAttribute('aria-invalid', 'true')
     // check the error message is displayed
     const error = screen.getByRole('alert')
     expect(error).toBeInTheDocument()
     // check the error content
     expect(error).toHaveTextContent(errorMessages.name)
     // check the error and its field have appropriate aria attributes
-    expect(error).toHaveAttribute('aria-live', 'assertive');
-    const describedById = nameField.getAttribute('aria-describedby');
-    expect(error).toHaveAttribute('id', describedById);
+    expect(error).toHaveAttribute('aria-live', 'assertive')
+    const describedById = nameField.getAttribute('aria-describedby')
+    expect(error).toHaveAttribute('id', describedById)
   })
 
   it('should display the response sentence when you click submit ', async () => {
@@ -54,9 +54,6 @@ describe('FavoriteForm', () => {
     expect(responseSentence).toBeInTheDocument()
   })
 })
-
-
-
 
 // 09/06/23 This was the original hook mocking code, but I've replaced it with MSW
 

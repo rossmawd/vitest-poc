@@ -1,11 +1,11 @@
-import {  useState } from 'react'
+import { useState } from 'react'
 import { nameValidation } from '../validators/nameValidation'
 interface FormValues {
   name: string
   email: string
   framework: string
 }
-export const errorMessages = { name: 'No Rapper names please: a-z only' }
+export const errorMessages = { name: 'a-z only please' }
 
 const useFavoriteForm = () => {
   const [formValues, setFormValues] = useState<FormValues>({
