@@ -6,8 +6,8 @@ const frameworkOptions = [
   { label: 'React', value: 'React' },
   { label: 'Angular', value: 'Angular' },
   { label: 'Vue.js', value: 'Vue.js' },
-]
-const MyForm: React.FC = () => {
+]// TODO: separate the hook from component. Move the FavoriteForm tests to App.test.tsx
+const FavoriteForm: React.FC = () => {
   const {
     formValues,
     handleSubmit,
@@ -71,4 +71,4 @@ const MyForm: React.FC = () => {
   )
 }
 
-export default MyForm
+export default FavoriteForm
