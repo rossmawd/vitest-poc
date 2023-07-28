@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { nameValidation } from '../validators/nameValidation'
+import { DetailsPostResponse } from '../../mocks/handlers'
 interface FormValues {
   name: string
   email: string
@@ -26,7 +27,7 @@ const useFavoriteForm = () => {
         },
         body: JSON.stringify(formValues),
       })
-      const data = await response.json()
+      const data: DetailsPostResponse = await response.json()
       setResponseSentence(data.message)
     } catch (error) {
       console.error(error)
